@@ -1,4 +1,4 @@
-# pyiron_colab
+# graphathon
 
 Playground for collaborative environment in order to create a workflow in parallel by distributing nodes (i.e. tasks) to different people.
 
