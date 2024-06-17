@@ -8,14 +8,22 @@ on:
   workflow_call:
 
 jobs:
-  build:
+  run_workflow:
     if: |
       github.event_name == 'push' ||
       ( github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow' ))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: pyiron/actions/build-notebooks@actions-3.2.0
+      - name: Setup environment
+        uses: pyiron/actions/cached-miniforge@actions-3.2.0
         with:
           python-version: '3.11'
           env-files: .ci_support/environment.yml
+          use-cache: 'true'
+          miniforge-channels: conda-forge
+          pip-install-versioneer: 'false'
+          no-build-isolation: 'false'
+      - name: Execute notebook
+        shell: bash -l {0}
+        run: jupyter nbconvert --execute --to notebook workflow.ipynb
