@@ -31,3 +31,8 @@ jobs:
       - name: Execute workflow
         shell: bash -l {0}
         run: papermill workflow.ipynb workflow-out.ipynb -k python3
+      - name: Upload updated notebook as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-out.ipynb
+          path: ./workflow-out.ipynb
