@@ -18,4 +18,4 @@ jobs:
       - uses: pyiron/actions/build-notebooks@actions-3.1.0
         with:
           python-version: '3.11'
-          env-files: ./environment.yml
+          env-files: .ci_support/environment.yml
