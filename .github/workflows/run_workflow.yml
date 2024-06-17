@@ -30,4 +30,4 @@ jobs:
         run: mamba install -n my-env jupyter
       - name: Execute workflow
         shell: bash -l {0}
-        run: jupyter nbconvert --execute --to notebook workflow.ipynb
+        run: jupyter nbconvert --ExecutePreprocessor.kernel_name=python3 --execute --to notebook workflow.ipynb
