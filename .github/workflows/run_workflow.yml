@@ -27,7 +27,7 @@ jobs:
           no-build-isolation: 'false'
       - name: Add jupyter
         shell: bash -l {0}
-        run: mamba install -n my-env jupyter
+        run: mamba install -n my-env papermill
       - name: Execute workflow
         shell: bash -l {0}
-        run: jupyter nbconvert --ExecutePreprocessor.kernel_name=python3 --execute --to notebook workflow.ipynb
+        run: papermill workflow.ipynb workflow-out.ipynb
