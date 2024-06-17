@@ -20,6 +20,7 @@ jobs:
         with:
           python-version: '3.11'
           env-files: .ci_support/environment.yml
+          local-code-directory: ''
           use-cache: 'true'
           miniforge-channels: conda-forge
           pip-install-versioneer: 'false'
