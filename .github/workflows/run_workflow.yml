@@ -1,0 +1,26 @@
+name: Run workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [labeled, opened, synchronize, reopened]
+
+jobs:
+  build:
+    if: |
+      github.event_name == 'push' ||
+      ( github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow' ))
+      
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - uses: conda-incubator/setup-miniconda@v2.2.0
+      with:
+        python-version: "3.11"
+        mamba-version: "*"
+        miniforge-variant: Mambaforge
+        channels: conda-forge
+        channel-priority: strict
+        auto-update-conda: true
+        environment-file: environment.yml
