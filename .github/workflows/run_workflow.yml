@@ -25,9 +25,9 @@ jobs:
           miniforge-channels: conda-forge
           pip-install-versioneer: 'false'
           no-build-isolation: 'false'
-      - name: Add papermill
+      - name: Add papermill and jupyter
         shell: bash -l {0}
-        run: mamba install -n my-env papermill
+        run: mamba install -n my-env jupyter papermill
       - name: Execute workflow
         shell: bash -l {0}
         run: papermill workflow.ipynb workflow-out.ipynb -k python3
