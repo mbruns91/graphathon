@@ -1,11 +1,10 @@
 # graphathon
 
-Playground for collaborative environment in order to create a workflow in parallel by distributing nodes (i.e. tasks) to different people.
+A template repository for setting up an environment where nodes for a workflow using `pyiron_workflow` can be developed by different people in parallel.
 
-## Basic idea
-
-1. Create a workflow in a large group, with empty nodes with only inputs and outputs defined
-2. Distribute the nodes to different people
-3. As people finish their tasks, they push the nodes to the repository, where CI takes care of the workflow execution
-
-More will follow...
+Usage goes like so:
+- the team sets up a dummy workflow using placeholder-vwersions of the involved nodes
+- the team creates a repository using *this* repo as a template (especially anything located in `.github/` and `.ci_support/`)
+- each dev opens a branch + PR for her work
+- as soon as the `run_workflow` label is added to the PR, each push triggers workflow execution via actions.
+- the updated notebook is uploaded as a github action artifact (Actions -> select CI run -> Artifacts). Download, unzip and view locally.

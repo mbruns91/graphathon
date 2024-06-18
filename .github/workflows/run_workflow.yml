@@ -1,0 +1,38 @@
+name: Run workflow
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    types: [labeled, opened, synchronize, reopened]
+  workflow_call:
+    
+jobs:
+  run_workflow:
+    if: |
+      github.event_name == 'push' ||
+      ( github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow' ))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup environment
+        uses: pyiron/actions/cached-miniforge@actions-3.2.0
+        with:
+          python-version: '3.11'
+          env-files: .ci_support/environment.yml
+          local-code-directory: ''
+          use-cache: 'true'
+          miniforge-channels: conda-forge
+          pip-install-versioneer: 'false'
+          no-build-isolation: 'false'
+      - name: Add papermill
+        shell: bash -l {0}
+        run: mamba install -n my-env papermill
+      - name: Execute workflow
+        shell: bash -l {0}
+        run: papermill workflow.ipynb workflow-out.ipynb -k python3
+      - name: Upload updated notebook as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: workflow-out.ipynb
+          path: ./workflow-out.ipynb
