@@ -11,8 +11,7 @@ jobs:
   run_workflow:
     if: |
       github.event_name == 'push' ||
-      (github.event_name == 'pull_request'  &&
-      contains(github.event.pull_request.labels.*.name, 'run_workflow'))
+      (github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow' ))
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
