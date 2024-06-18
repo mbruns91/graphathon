@@ -39,6 +39,7 @@ jobs:
           name: workflow-out.ipynb
           path: ./workflow-out.ipynb
       - name: push updated notebook back into the repository
+        uses: actions/checkout@v4
         shell: bash -l {0}
         run: |
           git config user.name "ci"
