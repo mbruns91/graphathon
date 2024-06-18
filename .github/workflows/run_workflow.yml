@@ -13,7 +13,6 @@ jobs:
       github.event_name == 'push' &&
       github.event_name == 'pull_request'  &&
       contains(github.event.pull_request.labels.*.name, 'run_workflow' )
-      #github.event.actor.login != 'ci'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
