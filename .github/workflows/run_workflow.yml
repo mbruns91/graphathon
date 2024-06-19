@@ -49,7 +49,6 @@ jobs:
       - name: push ./ci_output
         shell: bash -l {0}
         run: |
-          git config --get user.name
           git config user.name "ci"
           git config user.email "mbruns91@users.noreply.github.com"
           git add ci_output/*
