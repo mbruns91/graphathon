@@ -17,6 +17,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - name: Setup environment
         uses: pyiron/actions/cached-miniforge@actions-3.2.0
         with:
@@ -37,7 +39,7 @@ jobs:
           mkdir ci_output
           date +%s > ci_output/timestamp.txt
           mv workflow-out.ipynb ci_output/
-      - name: Upload updated notebook as artifact
+      - name: Upload CI output files as artifact
         uses: actions/upload-artifact@v4
         with:
           name: ci_output
@@ -45,6 +47,7 @@ jobs:
       - name: push ./ci_output
         shell: bash -l {0}
         run: |
+          git config --get user.name
           git config user.name "ci"
           git config user.email "mbruns91@users.noreply.github.com"
           git add ci_output/*
