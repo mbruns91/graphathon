@@ -40,7 +40,7 @@ jobs:
       - name: Upload updated notebook as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: workflow-out.ipynb
+          name: ci_output
           path: ./ci_output/*
       - uses: actions/checkout@v4
       - name: push ./ci_output
