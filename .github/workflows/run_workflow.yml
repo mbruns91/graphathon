@@ -12,7 +12,7 @@ jobs:
     if: |
       github.event_name == 'push' ||
       (github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow' ) &&
-      github.event.actor.login != 'ci')
+      github.event.actor.login != 'github-actions' &&)
       
     runs-on: ubuntu-latest
     steps:
@@ -48,8 +48,6 @@ jobs:
       - name: push ./ci_output
         shell: bash -l {0}
         run: |
-          git config user.name "ci"
-          git config user.email "mbruns91@users.noreply.github.com"
           git add ci_output/*
           git commit -m "push updated notebook to './ci_output/workflow-out.ipynb'"
           git push
