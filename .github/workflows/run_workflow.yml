@@ -6,9 +6,7 @@ on:
   pull_request:
     types: [labeled, opened, synchronize, reopened]
   workflow_call:
-permissions:
-  contents: write
-    
+
 jobs:
   run_workflow:
     if: |
@@ -21,6 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Setup environment
         uses: pyiron/actions/cached-miniforge@actions-3.2.0
         with:
