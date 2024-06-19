@@ -32,18 +32,22 @@ jobs:
         run: mamba install -n my-env jupyter papermill
       - name: Execute workflow
         shell: bash -l {0}
-        run: mkdir ci_output && papermill workflow.ipynb ./ci_output/workflow-out.ipynb -k python3
+        run: |
+          papermill workflow.ipynb workflow-out.ipynb -k python3
+          mkdir ci_output
+          date +%s > ci_output/timestamp.txt
+          mv workflow-out.ipynb ci_output/
       - name: Upload updated notebook as artifact
         uses: actions/upload-artifact@v4
         with:
           name: workflow-out.ipynb
-          path: ./ci_output/workflow-out.ipynb
+          path: ./ci_output/*
       - uses: actions/checkout@v4
-      - name: push updated notebook back into the repository
+      - name: push ./ci_output
         shell: bash -l {0}
         run: |
           git config user.name "ci"
           git config user.email "mbruns91@users.noreply.github.com"
-          git add ci_output/workflow-out.ipynb
+          git add ci_output/*
           git commit -m "push updated notebook to './ci_output/workflow-out.ipynb'"
           git push
