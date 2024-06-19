@@ -42,7 +42,6 @@ jobs:
         with:
           name: ci_output
           path: ./ci_output/*
-      - uses: actions/checkout@v4
       - name: push ./ci_output
         shell: bash -l {0}
         run: |
