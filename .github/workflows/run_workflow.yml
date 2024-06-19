@@ -38,7 +38,7 @@ jobs:
         shell: bash -l {0}
         run: |
           papermill workflow.ipynb workflow-out.ipynb -k python3
-          mkdir ci_output
+          mkdir -p ci_output
           date +%s > ci_output/timestamp.txt
           mv workflow-out.ipynb ci_output/
       - name: Upload CI output files as artifact
