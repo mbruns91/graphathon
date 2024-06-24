@@ -21,6 +21,18 @@ class EmptyGraph:
             result.update({"type": label.split(":")[1].strip()})
         return result
 
+    @staticmethod
+    def _group_output_nodes(labels):
+        if len(set([ll["variable"] for ll in labels])) == 1:
+            return labels[0]
+        v = ", ".join(list(set([ll["variable"] for ll in labels])))
+        d = {"variable": v}
+        if any(["type" not in ll for ll in labels]):
+            return d
+        t = ", ".join(list(set([ll["type"] for ll in labels])))
+        d.update({"type": f"tuple[{t}]"})
+        return d
+
     def _retrieve_nodes(self):
         node_outputs = defaultdict(list)
         node_inputs = defaultdict(list)
@@ -31,6 +43,6 @@ class EmptyGraph:
             if edge.get_source().lower() != "input":
                 node_outputs[edge.get_source()].append(label)
         return [
-            [value, node_outputs[key]]
+            {"input": value, "output": self._group_output_nodes(node_outputs[key])}
             for key, value in node_inputs.items()
         ]
