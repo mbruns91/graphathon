@@ -40,15 +40,11 @@ class EmptyGraph:
         node_inputs = defaultdict(list)
         for edge in self.graph.get_edges():
             label = self._parse_label(edge.get_label())
-            if edge.get_destination().lower() != "output":
-                node_inputs[edge.get_destination()].append(
-                    {
-                        "provenance": edge.get_source(),
-                        "label": label
-                    }
-                )
             if edge.get_source().lower() != "input":
                 node_outputs[edge.get_source()].append(label)
+            label.update({"provenance": edge.get_source()})
+            if edge.get_destination().lower() != "output":
+                node_inputs[edge.get_destination()].append(label)
         return [
             {
                 "method": key,
@@ -71,7 +67,7 @@ class EmptyGraph:
             if "type" in node["output"]:
                 output_type = f"-> {node['output']['type']}"
             input_args = ", ".join([
-                self._to_input_arg(ll) for ll in node['input']["label"]
+                self._to_input_arg(ll) for ll in node['input']
             ])
             yield {
                 "method": node["method"],
@@ -96,3 +92,23 @@ class EmptyGraph:
                 f.write(node["text"])
         with open(Path(directory) / "__init__.py", "w") as f:
             f.write(self._get_init(directory=directory))
+
+    def get_str(self, var_name="wf", base="nodes"):
+        txt = "from pyiron_workflow import Workflow\n\n\n"
+        txt += f"{var_name} = Workflow(\"{self.graph.get_name()}\")\n\n"
+        input_list = []
+        workflow_list = []
+        for node in self._nodes:
+            args = []
+            for input_tag in node["input"]:
+                if input_tag["provenance"].lower() == "input":
+                    input_list.append(input_tag["variable"])
+                    args.append(input_tag["variable"])
+                else:
+                    args.append(f"{var_name}.{input_tag['variable']}")
+            workflow_list.append(
+                f"{var_name}.{node['output']['variable']} = {base}.{node['method']}({', '.join(args)})"
+            )
+        txt += " = \n".join(list(set(input_list))) + " = \n\n"
+        txt += "\n".join(workflow_list)
+        return txt
