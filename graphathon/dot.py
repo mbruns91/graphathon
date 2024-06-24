@@ -2,6 +2,7 @@ import pydot
 from IPython.display import SVG
 from collections import defaultdict
 from pathlib import Path
+import networkx as nx
 
 
 class EmptyGraph:
@@ -97,7 +98,7 @@ class EmptyGraph:
         txt = "from pyiron_workflow import Workflow\n\n\n"
         txt += f"{var_name} = Workflow(\"{self.graph.get_name()}\")\n\n"
         input_list = []
-        workflow_list = []
+        workflow_dict = {}
         for node in self._nodes:
             args = []
             for input_tag in node["input"]:
@@ -106,9 +107,19 @@ class EmptyGraph:
                     args.append(input_tag["variable"])
                 else:
                     args.append(f"{var_name}.{input_tag['variable']}")
-            workflow_list.append(
+            workflow_dict[node['method']] = (
                 f"{var_name}.{node['output']['variable']} = {base}.{node['method']}({', '.join(args)})"
             )
         txt += " = \n".join(list(set(input_list))) + " = \n\n"
-        txt += "\n".join(workflow_list)
+        txt += "\n".join([workflow_dict[term] for term in self._ordered_elements])
         return txt
+
+    @property
+    def _ordered_elements(self):
+        return [
+            elem
+            for elem in nx.topological_sort(
+                nx.nx_pydot.from_pydot(self.graph)
+            )
+            if elem not in ["input", "output"]
+        ]
