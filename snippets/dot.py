@@ -1,6 +1,7 @@
 import pydot
 from IPython.display import SVG
 from collections import defaultdict
+from pathlib import Path
 
 
 class EmptyGraph:
@@ -67,12 +68,15 @@ class EmptyGraph:
             input_args = ", ".join([
                 self._to_input_arg(ll) for ll in node['input']
             ])
-            yield (
-                "from pyiron_workflow import Workflow\n\n\n"
-                "@Workflow.wrap.as_function_node()\n"
-                f"def {node['method']}({input_args}) {output_type}:\n"
-                f"    return {node['output']['variable']}\n"
-            )
+            yield {
+                "method": node["method"],
+                "text": (
+                    "from pyiron_workflow import Workflow\n\n\n"
+                    "@Workflow.wrap.as_function_node()\n"
+                    f"def {node['method']}({input_args}) {output_type}:\n"
+                    f"    return {node['output']['variable']}\n"
+                )
+            }
 
     def _get_init(self, directory="nodes"):
         directory = directory.replace("\\", "/").replace("/", ".")
@@ -80,3 +84,10 @@ class EmptyGraph:
             f"from {directory}.{node['method']} import {node['method']}"
             for node in self._nodes
         ])
+
+    def export(self, directory="nodes"):
+        for node in self._node_py:
+            with open(Path(directory) / Path(node["method"] + ".py"), "w") as f:
+                f.write(node["text"])
+        with open("__init__.py", "w") as f:
+            f.write(self._get_init(directory=directory))
