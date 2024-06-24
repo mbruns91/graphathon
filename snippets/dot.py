@@ -33,7 +33,8 @@ class EmptyGraph:
         d.update({"type": f"tuple[{t}]"})
         return d
 
-    def _retrieve_nodes(self):
+    @property
+    def _nodes(self):
         node_outputs = defaultdict(list)
         node_inputs = defaultdict(list)
         for edge in self.graph.get_edges():
@@ -43,6 +44,39 @@ class EmptyGraph:
             if edge.get_source().lower() != "input":
                 node_outputs[edge.get_source()].append(label)
         return [
-            {"input": value, "output": self._group_output_nodes(node_outputs[key])}
+            {
+                "method": key,
+                "input": value,
+                "output": self._group_output_nodes(node_outputs[key])
+            }
             for key, value in node_inputs.items()
         ]
+
+    @staticmethod
+    def _to_input_arg(label):
+        if "type" in label:
+            return f"{label['variable']}: {label['type']}"
+        return f"{label['variable']}"
+
+    @property
+    def _node_py(self):
+        for node in self._nodes:
+            output_type = ""
+            if "type" in node["output"]:
+                output_type = f"-> {node['output']['type']}"
+            input_args = ", ".join([
+                self._to_input_arg(ll) for ll in node['input']
+            ])
+            yield (
+                "from pyiron_workflow import Workflow\n\n\n"
+                "@Workflow.wrap.as_function_node()\n"
+                f"def {node['method']}({input_args}) {output_type}:\n"
+                f"    return {node['output']['variable']}\n"
+            )
+
+    def _get_init(self, directory="nodes"):
+        directory = directory.replace("\\", "/").replace("/", ".")
+        return "\n".join([
+            f"from {directory}.{node['method']} import {node['method']}"
+            for node in self._nodes
+        ])
