@@ -9,7 +9,7 @@ class EmptyGraph:
         self.graph = pydot.graph_from_dot_data(text_input)[0]
         self.graph.set_type("digraph")
 
-    def return_svg(self):
+    def draw(self):
         return SVG(self.graph.create_svg())
 
     @staticmethod
@@ -41,7 +41,12 @@ class EmptyGraph:
         for edge in self.graph.get_edges():
             label = self._parse_label(edge.get_label())
             if edge.get_destination().lower() != "output":
-                node_inputs[edge.get_destination()].append(label)
+                node_inputs[edge.get_destination()].append(
+                    {
+                        "provenance": edge.get_source(),
+                        "label": label
+                    }
+                )
             if edge.get_source().lower() != "input":
                 node_outputs[edge.get_source()].append(label)
         return [
@@ -66,7 +71,7 @@ class EmptyGraph:
             if "type" in node["output"]:
                 output_type = f"-> {node['output']['type']}"
             input_args = ", ".join([
-                self._to_input_arg(ll) for ll in node['input']
+                self._to_input_arg(ll) for ll in node['input']["label"]
             ])
             yield {
                 "method": node["method"],
@@ -89,5 +94,5 @@ class EmptyGraph:
         for node in self._node_py:
             with open(Path(directory) / Path(node["method"] + ".py"), "w") as f:
                 f.write(node["text"])
-        with open("__init__.py", "w") as f:
+        with open(Path(directory) / "__init__.py", "w") as f:
             f.write(self._get_init(directory=directory))
