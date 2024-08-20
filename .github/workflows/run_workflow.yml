@@ -7,7 +7,7 @@ on:
     types: [labeled, opened, synchronize, reopened]
   workflow_call:
 permissions:
-      contents: write-all
+      contents: write
 jobs:
   run_workflow:
     if: |
