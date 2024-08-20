@@ -54,19 +54,19 @@ jobs:
           git add ci_output/*
           git commit -m "push updated notebook to './ci_output/workflow-out.ipynb'"
           git push
-        - name: Post a comment linking the executed notebook
-          uses: actions/github-script@v7
-          with:
-            github-token: ${{ secrets.GITHUB_TOKEN }}
-            script: |
-              const issueNumber = context.payload.pull_request.number;
-              const branchName = context.payload.pull_request.head.ref;
-              const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${branchName}`;
-              const relativeTarget = `ci_output/workflow-out.ipynb`;
-              const comment = `:robot: Here is the [workflow output notebook on this branch](${repoUrl}/${relativeTarget})`;
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: issueNumber,
-                body: comment,
-              });
+      - name: Post a comment linking the executed notebook
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.pull_request.number;
+            const branchName = context.payload.pull_request.head.ref;
+            const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${branchName}`;
+            const relativeTarget = `ci_output/workflow-out.ipynb`;
+            const comment = `:robot: Here is the [workflow output notebook on this branch](${repoUrl}/${relativeTarget})`;
+            await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber,
+            body: comment,
+            });
