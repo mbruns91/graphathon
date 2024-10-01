@@ -1,0 +1,5 @@
+# exclude any secrets or api tokens from this repository
+.secrets/*
+
+# include the secrets/ dir by adding a .gitkeep and including it explicitly
+!.secrets/.gitkeep

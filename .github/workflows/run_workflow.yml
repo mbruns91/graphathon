@@ -6,15 +6,22 @@ on:
   pull_request:
     types: [labeled, opened, synchronize, reopened]
   workflow_call:
-    
+permissions:
+      contents: write
+      pull-requests: write
 jobs:
   run_workflow:
     if: |
       github.event_name == 'push' ||
-      ( github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow' ))
+      (github.event_name == 'pull_request'  && contains(github.event.pull_request.labels.*.name, 'run_workflow') &&
+      github.event.actor.login != 'github-actions' &&
+      github.event.actor.login != 'ci')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ github.event.pull_request.head.ref }}
       - name: Setup environment
         uses: pyiron/actions/cached-miniforge@actions-3.2.0
         with:
@@ -30,9 +37,37 @@ jobs:
         run: mamba install -n my-env jupyter papermill
       - name: Execute workflow
         shell: bash -l {0}
-        run: papermill workflow.ipynb workflow-out.ipynb -k python3
-      - name: Upload updated notebook as artifact
+        run: |
+          papermill workflow.ipynb workflow-out.ipynb -k python3
+          mkdir -p ci_output
+          date +%s > ci_output/timestamp.txt
+          mv workflow-out.ipynb ci_output/
+      - name: Upload CI output files as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: workflow-out.ipynb
-          path: ./workflow-out.ipynb
+          name: ci_output
+          path: ./ci_output/*
+      - name: push ./ci_output
+        shell: bash -l {0}
+        run: |
+          git config user.name 'ci'
+          git config user.email 'mbruns91@users.noreply.github.com'
+          git add ci_output/*
+          git commit -m "push updated notebook to './ci_output/workflow-out.ipynb'"
+          git push
+      - name: Post a comment linking the executed notebook
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const issueNumber = context.payload.pull_request.number;
+            const branchName = context.payload.pull_request.head.ref;
+            const repoUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/blob/${branchName}`;
+            const relativeTarget = `ci_output/workflow-out.ipynb`;
+            const comment = `:robot: Here is the [workflow output notebook on this branch](${repoUrl}/${relativeTarget})`;
+            await github.rest.issues.createComment({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            issue_number: issueNumber,
+            body: comment,
+            });
