@@ -29,8 +29,8 @@ jobs:
           env-files: .ci_support/environment.yml
           env-path: 'cached-miniforge/my-env' #/home/runner/miniconda3/envs/my-env
           local-code-directory: ''
-          use-cache: 'false'
-          miniforge-variant: miniforge
+          use-cache: 'true'
+          miniforge-variant: Mambaforge
           miniforge-channels: conda-forge
           pip-install-versioneer: 'false'
           no-build-isolation: 'false'
