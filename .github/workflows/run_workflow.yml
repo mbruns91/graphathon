@@ -23,7 +23,7 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Setup environment
-        uses: pyiron/actions/cached-miniforge@actions-3.2.0
+        uses: pyiron/actions/cached-miniforge@actions-3.3.1
         with:
           python-version: '3.11'
           env-files: .ci_support/environment.yml
