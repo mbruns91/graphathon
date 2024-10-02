@@ -27,7 +27,7 @@ jobs:
         with:
           python-version: '3.11'
           env-files: .ci_support/environment.yml
-          env-path: 'miniconda3/envs/my-env'
+          #env-path: 'miniconda3/envs/my-env'
           local-code-directory: ''
           use-cache: 'true'
           miniforge-variant: Mambaforge
@@ -36,7 +36,7 @@ jobs:
           no-build-isolation: 'false'
       - name: Add papermill and jupyter
         shell: bash -l {0}
-        run: mamba install -n my-env jupyter papermill
+        run: mamba install -p /home/runner/work/graphathon/graphathon/miniconda3/envs/my-env jupyter papermill
       - name: Execute workflow
         shell: bash -l {0}
         run: |
