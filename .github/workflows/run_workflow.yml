@@ -23,18 +23,20 @@ jobs:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.ref }}
       - name: Setup environment
-        uses: pyiron/actions/cached-miniforge@actions-3.2.0
+        uses: pyiron/actions/cached-miniforge@actions-3.3.1
         with:
           python-version: '3.11'
           env-files: .ci_support/environment.yml
+          #env-path: 'miniconda3/envs/my-env'
           local-code-directory: ''
           use-cache: 'true'
+          miniforge-variant: Mambaforge
           miniforge-channels: conda-forge
           pip-install-versioneer: 'false'
           no-build-isolation: 'false'
       - name: Add papermill and jupyter
         shell: bash -l {0}
-        run: mamba install -n my-env jupyter papermill
+        run: mamba install -p /home/runner/work/graphathon/graphathon/miniconda3/envs/my-env jupyter papermill
       - name: Execute workflow
         shell: bash -l {0}
         run: |
